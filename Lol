@@ -1,0 +1,175 @@
+local ChromeOS = {}
+
+local colors = {  
+    background = Color3.fromRGB(34, 34, 34),
+    topbar = Color3.fromRGB(45, 45, 45),
+    titleText = Color3.fromRGB(255, 255, 255),
+    descriptionText = Color3.fromRGB(200, 200, 200),
+    closeButtonText = Color3.fromRGB(255, 255, 255),
+    closeButtonBackground = Color3.fromRGB(255, 68, 68),
+    contentBackground = Color3.fromRGB(50, 50, 50),
+    tabButtonBackground = Color3.fromRGB(70, 70, 70),
+    tabButtonHover = Color3.fromRGB(100, 100, 100),
+    tabButtonActive = Color3.fromRGB(30, 30, 30),
+    toggleOn = Color3.fromRGB(76, 175, 80),
+    toggleOff = Color3.fromRGB(244, 67, 54),
+    sliderBackground = Color3.fromRGB(120, 120, 120),
+    textboxBackground = Color3.fromRGB(255, 255, 255)
+}
+
+local function addCorner(instance, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius)
+    corner.Parent = instance
+end
+
+function ChromeOS.Create(titleText, descriptionText)
+    local CoreGui = game:GetService("CoreGui")
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = CoreGui
+    
+    -- Frame principal
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 700, 0, 400)
+    mainFrame.Position = UDim2.new(0.5, -350, 0.5, -230)
+    mainFrame.BackgroundColor3 = colors.background
+    mainFrame.BorderSizePixel = 3
+    mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    mainFrame.BackgroundTransparency = 0.2
+    mainFrame.Parent = gui
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    addCorner(mainFrame, 12)
+
+    -- Sombra
+    local shadow = Instance.new("ImageLabel")
+    shadow.Size = UDim2.new(1, 30, 1, 30)
+    shadow.Position = UDim2.new(0, -15, 0, -15)
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageTransparency = 0.5
+    shadow.BackgroundTransparency = 1
+    shadow.ZIndex = -1
+    shadow.Parent = mainFrame
+
+    -- Barra superior
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, 0, 0, 40)
+    topBar.BackgroundColor3 = colors.topbar
+    topBar.BorderSizePixel = 0
+    topBar.BackgroundTransparency = 0.1
+    topBar.Parent = mainFrame
+    addCorner(topBar, 12)
+
+    -- Título
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "TitleLabel"
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 28
+    titleLabel.TextColor3 = colors.titleText
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Position = UDim2.new(0, 160, 0.5, -3)
+    titleLabel.Text = titleText or "Título"
+    titleLabel.Parent = topBar
+
+    -- Descripción
+    local descriptionLabel = Instance.new("TextLabel")
+    descriptionLabel.Name = "DescriptionLabel"
+    descriptionLabel.Font = Enum.Font.Gotham
+    descriptionLabel.TextSize = 18
+    descriptionLabel.TextColor3 = colors.descriptionText
+    descriptionLabel.BackgroundTransparency = 1
+    descriptionLabel.Position = UDim2.new(0, 280, 0.5, 1)
+    descriptionLabel.Text = descriptionText or "Descripción"
+    descriptionLabel.Parent = topBar
+
+    -- Botón de cerrar
+    local closeButton = Instance.new("TextButton")
+    closeButton.Text = "✕"
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextSize = 18
+    closeButton.TextColor3 = colors.closeButtonText
+    closeButton.BackgroundColor3 = colors.closeButtonBackground
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -40, 0, 5)
+    closeButton.BackgroundTransparency = 0.2
+    closeButton.Parent = topBar
+    addCorner(closeButton, 8)
+
+    closeButton.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    -- Pestañas
+    local tabScroll = Instance.new("ScrollingFrame")
+    tabScroll.Size = UDim2.new(1, 0, 0, 40)
+    tabScroll.Position = UDim2.new(0, 0, 0, 40)
+    tabScroll.CanvasSize = UDim2.new(0, 600, 0, 0)
+    tabScroll.ScrollBarThickness = 1
+    tabScroll.BackgroundColor3 = colors.background
+    tabScroll.BackgroundTransparency = 0
+    tabScroll.Parent = mainFrame
+    
+    local tabLayout = Instance.new("UIListLayout")
+    tabLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabLayout.Padding = UDim.new(0, 5)
+    tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabLayout.Parent = tabScroll
+    
+    -- Función para agregar pestañas
+    local tabFrames = {}
+    local function AddTab(tabName)
+        local tabButton = Instance.new("TextButton")
+        tabButton.Size = UDim2.new(0, 130, 1, 0)
+        tabButton.Text = tabName
+        tabButton.Font = Enum.Font.GothamBold
+        tabButton.TextSize = 14
+        tabButton.BackgroundColor3 = colors.tabButtonBackground
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.BackgroundTransparency = 0.4
+        tabButton.Parent = tabScroll
+        addCorner(tabButton, 8)
+
+        local tabFrame = Instance.new("Frame")
+        tabFrame.Size = UDim2.new(1, 0, 1, -80)
+        tabFrame.Position = UDim2.new(0, 0, 0, 80)
+        tabFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        tabFrame.BackgroundTransparency = 0.3
+        tabFrame.Visible = false
+        tabFrame.Parent = mainFrame
+
+        local frameScroll = Instance.new("ScrollingFrame")
+        frameScroll.Size = UDim2.new(1, -10, 1, -10)
+        frameScroll.Position = UDim2.new(0, 5, 0, 5)
+        frameScroll.CanvasSize = UDim2.new(0, 0, 2, 0)
+        frameScroll.ScrollBarThickness = 4
+        frameScroll.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        frameScroll.BackgroundTransparency = 0.2
+        frameScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+        frameScroll.Parent = tabFrame
+
+        local buttonLayout = Instance.new("UIListLayout")
+        buttonLayout.Padding = UDim.new(0, 5)
+        buttonLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        buttonLayout.Parent = frameScroll
+
+        tabFrames[tabName] = tabFrame
+        tabScroll.CanvasSize = UDim2.new(0, 130 * #tabScroll:GetChildren(), 0, 40)
+
+        tabButton.MouseButton1Click:Connect(function()
+            for _, frame in pairs(tabFrames) do
+                frame.Visible = false
+            end
+            tabFrame.Visible = true
+        end)
+
+        return frameScroll
+    end
+
+    -- Crear una pestaña de ejemplo
+    AddTab("Ejemplo")
+
+    return gui
+end
+
+return ChromeOS
